@@ -296,9 +296,12 @@ class Train(object):
         return self.func(self.dcgan, config)
 
 def get_vars(self):
+
     t_vars = tf.trainable_variables()
-    self.d_vars = [var for var in t_vars if var.name.startswith('d_')]
-    self.g_vars = [var for var in t_vars if var.name.startswith('g_')]
+
+    self.d_vars = [var for var in t_vars if 'd_' in var.name]
+    self.g_vars = [var for var in t_vars if 'g_' in var.name]
+
     for x in self.d_vars:
         assert x not in self.g_vars
     for x in self.g_vars:
