@@ -9,7 +9,7 @@ def train(self, config):
     d_optim = self.d_optim
     g_optim = self.g_optim
 
-    tf.initialize_all_variables().run()
+    tf.global_variables_initializer().run()
 
     self.saver = tf.train.Saver()
     #self.g_sum = tf.merge_summary([#self.z_sum,
@@ -17,7 +17,7 @@ def train(self, config):
     #    self.G_sum, self.d_loss_fake_sum, self.g_loss_sum])
     # self.d_sum = tf.merge_summary([#self.z_sum,
     #     self.d_sum, self.d_loss_real_sum, self.d_loss_sum])
-    self.writer = tf.train.SummaryWriter("./logs", self.sess.graph_def)
+    self.writer = tf.train.summary.FileWriter("./logs", self.sess.graph_def)
 
 
     coord = tf.train.Coordinator()

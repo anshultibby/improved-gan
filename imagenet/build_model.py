@@ -60,11 +60,11 @@ def build_model_single_gpu(self, gpu_idx):
                                         name='sample_images')
         self.sample_labels = tf.placeholder(tf.int32, [self.sample_size], name="sample_labels")
 
-        #self.reference_G, self.reference_zs = self.generator(is_ref=True)
+        self.reference_G, self.reference_zs = self.generator(is_ref=True)
         # Since I don't know how to turn variable reuse off, I can only activate it once.
         # So here I build a dummy copy of the discriminator before turning variable reuse on for the generator.
-        #dummy_joint = tf.concat(0, [images, self.reference_G])
-        #dummy = self.discriminator(dummy_joint, reuse=False, prefix="dummy")
+        dummy_joint = tf.concat(0, [images, self.reference_G])
+        dummy = self.discriminator(dummy_joint, reuse=False, prefix="dummy")
 
     G, zs = self.generator(is_ref=False)
 
@@ -82,12 +82,12 @@ def build_model_single_gpu(self, gpu_idx):
     self.zses.append(zs)
 
     joint = tf.concat(0, [images, G])
-    class_logits, D_on_data, D_on_data_logits, D_on_G, D_on_G_logits = self.discriminator(joint, reuse=False , prefix="joint ")
+    class_logits, D_on_data, D_on_data_logits, D_on_G, D_on_G_logits = self.discriminator(joint, reuse=True , prefix="joint ")
     # D_on_G_logits = tf.Print(D_on_G_logits, [D_on_G_logits], "D_on_G_logits")
 
-    self.d_sum = tf.histogram_summary("d", D_on_data)
-    self.d__sum = tf.histogram_summary("d_", D_on_G)
-    self.G_sum = tf.image_summary("G", G)
+    self.d_sum = tf.summary.histogram("d", D_on_data)
+    self.d__sum = tf.summary.histogram("d_", D_on_G)
+    self.G_sum = tf.summary.image("G", G)
 
     d_label_smooth = self.d_label_smooth
     d_loss_real = sigmoid_kl_with_logits(D_on_data_logits, 1. - d_label_smooth)
