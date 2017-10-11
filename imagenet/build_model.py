@@ -63,7 +63,7 @@ def build_model_single_gpu(self, gpu_idx):
         self.reference_G, self.reference_zs = self.generator(is_ref=True)
         # Since I don't know how to turn variable reuse off, I can only activate it once.
         # So here I build a dummy copy of the discriminator before turning variable reuse on for the generator.
-        dummy_joint = tf.concat(0, [images, self.reference_G])
+        dummy_joint = tf.concat(axis = 0, values = [images, self.reference_G])
         dummy = self.discriminator(dummy_joint, reuse=False, prefix="dummy")
 
     G, zs = self.generator(is_ref=False)
@@ -81,7 +81,7 @@ def build_model_single_gpu(self, gpu_idx):
     self.Gs.append(G)
     self.zses.append(zs)
 
-    joint = tf.concat(0, [images, G])
+    joint = tf.concat(axis = 0, values = [images, G])
     class_logits, D_on_data, D_on_data_logits, D_on_G, D_on_G_logits = self.discriminator(joint, reuse=True , prefix="joint ")
     # D_on_G_logits = tf.Print(D_on_G_logits, [D_on_G_logits], "D_on_G_logits")
 
@@ -92,8 +92,8 @@ def build_model_single_gpu(self, gpu_idx):
     d_label_smooth = self.d_label_smooth
     d_loss_real = sigmoid_kl_with_logits(D_on_data_logits, 1. - d_label_smooth)
     class_loss_weight = 1.
-    d_loss_class = class_loss_weight * tf.nn.sparse_softmax_cross_entropy_with_logits(class_logits,
-            tf.to_int64(sparse_labels))
+    d_loss_class = class_loss_weight * tf.nn.sparse_softmax_cross_entropy_with_logits(logits = class_logits,
+            labels = tf.to_int64(sparse_labels))
     error_rate = 1. - tf.reduce_mean(tf.to_float(tf.nn.in_top_k(class_logits, sparse_labels, 1)))
     # self.d_loss_class = tf.Print(self.d_loss_class, [error_rate], "gpu " + str(gpu_idx) + " current minibatch error rate")
     if gpu_idx == 0:
@@ -113,8 +113,8 @@ def build_model_single_gpu(self, gpu_idx):
     # Increasing beta makes the generator self-reinforcing.
     # Note that using this one-sided label smoothing also shifts the equilibrium
     # value to alpha/2.
-    d_loss_fake = tf.nn.sigmoid_cross_entropy_with_logits(D_on_G_logits,
-            tf.zeros_like(D_on_G_logits))
+    d_loss_fake = tf.nn.sigmoid_cross_entropy_with_logits(logits = D_on_G_logits,
+            labels = tf.zeros_like(D_on_G_logits))
     g_loss = sigmoid_kl_with_logits(D_on_G_logits, self.generator_target_prob)
     d_loss_class = tf.reduce_mean(d_loss_class)
     d_loss_real = tf.reduce_mean(d_loss_real)

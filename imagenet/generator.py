@@ -77,7 +77,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h0z', dtype=tf.float32)
             zs.append(h0z)
-            h0 = tf.concat(3, [h0, h0z])
+            h0 = tf.concat(axis = 3, values = [h0, h0z])
 
             h1 = reuse_wrapper(deconv2d(h0,
                 [dcgan.batch_size, 8, 8, dcgan.gf_dim*4], name='g_h1', with_w=make_vars),
@@ -87,7 +87,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h1z', dtype=tf.float32)
             zs.append(h1z)
-            h1 = tf.concat(3, [h1, h1z])
+            h1 = tf.concat(axis = 3, values = [h1, h1z])
 
 
             h2 = reuse_wrapper(deconv2d(h1,
@@ -101,7 +101,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h2z', dtype=tf.float32)
             zs.append(h2z)
-            h2 = tf.concat(3, [h2, h2z])
+            h2 = tf.concat(axis = 3, values = [h2, h2z])
 
 
             h3 = reuse_wrapper(deconv2d(h2,
@@ -121,7 +121,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h3z', dtype=tf.float32)
             zs.append(h3z)
-            h3 = tf.concat(3, [h3, h3z])
+            h3 = tf.concat(axis = 3, values = [h3, h3z])
 
             assert dcgan.image_shape[0] == 128
 
@@ -139,7 +139,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h4z', dtype=tf.float32)
             zs.append(h4z)
-            h4 = tf.concat(3, [h4, h4z])
+            h4 = tf.concat(axis = 3,values = [h4, h4z])
 
             h5 = reuse_wrapper(deconv2d(h4,
                     [dcgan.batch_size, 128, 128, dcgan.gf_dim * 1],
@@ -155,7 +155,7 @@ class Generator(object):
                                        minval=-1., maxval=1.,
                                        name='h5z', dtype=tf.float32)
             zs.append(h5z)
-            h5 = tf.concat(3, [h5, h5z])
+            h5 = tf.concat(axis = 3, values = [h5, h5z])
 
             h6 = reuse_wrapper(deconv2d(h5,
                     [dcgan.batch_size, 128, 128, 3],
